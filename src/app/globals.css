@@ -6,9 +6,9 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
-}
+} */
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
     --background-start-rgb: 0, 0, 0;
@@ -31,12 +31,17 @@ html, body {
 }
 
 body {
-  @apply flex flex-col;
+  @apply flex flex-col antialiased;
+  @apply bg-gradient-to-br from-zinc-300;
+}
+
+h1 {
+  text-shadow: 1px 1px rgba(255,255,255,0.8);
 }
 
 .markdown-body {
   /* white-space: pre-wrap; */
-  @apply bg-transparent text-slate-700;
+  @apply !bg-transparent text-slate-700;
   /* background-color: transparent !important; */
 }
 

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "github-markdown-css"
 import "./globals.css"
+import Image from "next/image"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -14,7 +15,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="mx-12 mt-12 flex items-center">
+          <Image src="/logo.png" alt="logo" width={48} height={63} />
+          <h1 className="text-4xl ml-3 text-gray-500 uppercase font-bold">
+            GhostWriter
+          </h1>
+        </div>
+        {children}
+      </body>
     </html>
   )
 }

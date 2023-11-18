@@ -20,6 +20,8 @@ const DEBOUNCE_DELAY = 5000
 const SYSTEM_PROMPT = `You are an assistant in charge of helping the user to write a text.
 The text could be a story, a novel, a list of items to buy at the supermarket or the user's CV.
 Do your best to bring the relevant improvements and corrections to the user's text.
+Try to propose a better version of the user's text.
+Adapt to the user's language. Keep the original language of the users's text, never attempt to translate the user's text.
 Use Markdown to format your answers.
 Start by welcoming the user and tell him that you will start your job as soon as he starts writting text.
 `
@@ -35,7 +37,10 @@ export default function Page() {
   useEffect(() => {
     async function sendMessage() {
       console.log("appel à appendRef.current()")
-      await appendRef.current({ content: debouncedValue, role: "user" })
+      const content = `Here is my text:
+---
+${debouncedValue}`
+      await appendRef.current({ content, role: "user" })
     }
     if (debouncedValue && debouncedValue.length) {
       sendMessage()
@@ -55,25 +60,15 @@ export default function Page() {
     }
   }, [])
 
-  function handleChange(value: string) {
-    const message = `Here is my text:
----
-${value}
-    `
-    setValue(message)
-  }
-
   return (
     <div className="page flex flex-1 p-12 gap-12 overflow-y-auto">
       <ReactCodeMirror
         value={value}
         height="100%"
         autoFocus={true}
-        // theme={githubDark}
-        // theme={materialLight}
         theme={duotoneLight}
-        className="flex-1 shadow overflow-auto relative"
         onChange={(value) => setValue(value)}
+        className="flex-1 shadow overflow-auto relative"
         extensions={[
           markdown({ base: markdownLanguage, codeLanguages: languages }),
         ]}
