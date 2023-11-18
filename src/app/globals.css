@@ -35,10 +35,23 @@ body {
 }
 
 .markdown-body {
+  /* white-space: pre-wrap; */
   @apply bg-transparent text-slate-700;
   /* background-color: transparent !important; */
 }
 
 .markdown-body pre > div {
   padding: 12px 16px !important;
+}
+
+.markdown-body p {
+  @apply whitespace-pre-wrap;
+}
+
+.markdown-body ul li {
+  @apply list-disc whitespace-normal;
+}
+
+.cm-editor {
+  @apply !outline-none text-sm;
 }

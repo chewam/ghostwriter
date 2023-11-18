@@ -7,7 +7,9 @@ import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState } from "react"
 import ReactCodeMirror from "@uiw/react-codemirror"
 import { languages } from "@codemirror/language-data"
-import { githubDark } from "@uiw/codemirror-theme-github"
+// import { githubDark } from "@uiw/codemirror-theme-github"
+// import { materialLight } from "@uiw/codemirror-theme-material"
+import { duotoneLight } from "@uiw/codemirror-theme-duotone"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 
 import useDebounce from "@/lib/use-debounce"
@@ -15,9 +17,17 @@ import spinner from "@/app/spinner.svg"
 
 const DEBOUNCE_DELAY = 5000
 
+const SYSTEM_PROMPT = `You are an assistant in charge of helping the user to write a text.
+The text could be a story, a novel, a list of items to buy at the supermarket or the user's CV.
+Do your best to bring the relevant improvements and corrections to the user's text.
+Use Markdown to format your answers.
+Start by welcoming the user and tell him that you will start your job as soon as he starts writting text.
+`
+
 export default function Page() {
   const [value, setValue] = useState("")
   const { messages, append, isLoading } = useChat()
+  const isStarting = useRef(false)
   const debouncedValue = useDebounce(value, DEBOUNCE_DELAY)
 
   const appendRef = useRef(append)
@@ -28,28 +38,47 @@ export default function Page() {
       await appendRef.current({ content: debouncedValue, role: "user" })
     }
     if (debouncedValue && debouncedValue.length) {
-      console.log("debouncedValue has changed:", debouncedValue)
       sendMessage()
     }
-  }, [debouncedValue, appendRef])
+  }, [debouncedValue])
 
   useEffect(() => {
-    console.log("messages have changed:", messages.length, messages)
-  }, [messages])
+    async function startConversation() {
+      console.log("start conversation")
+      await appendRef.current({ content: SYSTEM_PROMPT, role: "system" })
+    }
+    if (!isStarting.current) {
+      startConversation()
+    }
+    return () => {
+      isStarting.current = true
+    }
+  }, [])
+
+  function handleChange(value: string) {
+    const message = `Here is my text:
+---
+${value}
+    `
+    setValue(message)
+  }
 
   return (
-    <div className="page flex flex-1 p-12 gap-12">
+    <div className="page flex flex-1 p-12 gap-12 overflow-y-auto">
       <ReactCodeMirror
         value={value}
         height="100%"
-        theme={githubDark}
-        className="flex-1 shadow"
+        autoFocus={true}
+        // theme={githubDark}
+        // theme={materialLight}
+        theme={duotoneLight}
+        className="flex-1 shadow overflow-auto relative"
         onChange={(value) => setValue(value)}
         extensions={[
           markdown({ base: markdownLanguage, codeLanguages: languages }),
         ]}
       />
-      <div className="flex-1 relative">
+      <div className="flex-1 relative overflow-y-auto">
         {messages.map((m, i) =>
           m.role === "assistant" && i === messages.length - 1 ? (
             <div key={m.id}>

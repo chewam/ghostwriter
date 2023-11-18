@@ -11,7 +11,9 @@
   "dependencies": {
     "@codemirror/lang-markdown": "6.2.2",
     "@codemirror/language-data": "6.3.1",
+    "@uiw/codemirror-theme-duotone": "4.21.20",
     "@uiw/codemirror-theme-github": "4.21.20",
+    "@uiw/codemirror-theme-material": "4.21.20",
     "@uiw/react-codemirror": "4.21.20",
     "ai": "2.2.18",
     "github-markdown-css": "5.4.0",
