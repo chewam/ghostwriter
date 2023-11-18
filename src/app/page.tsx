@@ -1,65 +1,75 @@
-// gary-van-woerkens-5971b027
-"use client";
+"use client"
 
-import remarkGfm from "remark-gfm";
-import { useChat } from "ai/react";
-import ReactMarkdown from "react-markdown";
+import Image from "next/image"
+import { useChat } from "ai/react"
+import remarkGfm from "remark-gfm"
+import ReactMarkdown from "react-markdown"
+import { useEffect, useRef, useState } from "react"
+import ReactCodeMirror from "@uiw/react-codemirror"
+import { languages } from "@codemirror/language-data"
+import { githubDark } from "@uiw/codemirror-theme-github"
+import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 
-export default function Chat() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat();
+import useDebounce from "@/lib/use-debounce"
+import spinner from "@/app/spinner.svg"
+
+const DEBOUNCE_DELAY = 5000
+
+export default function Page() {
+  const [value, setValue] = useState("")
+  const { messages, append, isLoading } = useChat()
+  const debouncedValue = useDebounce(value, DEBOUNCE_DELAY)
+
+  const appendRef = useRef(append)
+
+  useEffect(() => {
+    async function sendMessage() {
+      console.log("appel à appendRef.current()")
+      await appendRef.current({ content: debouncedValue, role: "user" })
+    }
+    if (debouncedValue && debouncedValue.length) {
+      console.log("debouncedValue has changed:", debouncedValue)
+      sendMessage()
+    }
+  }, [debouncedValue, appendRef])
+
+  useEffect(() => {
+    console.log("messages have changed:", messages.length, messages)
+  }, [messages])
 
   return (
-    <div className="container m-auto">
-      {messages.map((m) => (
+    <div className="page flex flex-1 p-12 gap-12">
+      <ReactCodeMirror
+        value={value}
+        height="100%"
+        theme={githubDark}
+        className="flex-1 shadow"
+        onChange={(value) => setValue(value)}
+        extensions={[
+          markdown({ base: markdownLanguage, codeLanguages: languages }),
+        ]}
+      />
+      <div className="flex-1 relative">
+        {messages.map((m, i) =>
+          m.role === "assistant" && i === messages.length - 1 ? (
+            <div key={m.id}>
+              <ReactMarkdown
+                className="markdown-body"
+                remarkPlugins={[remarkGfm]}
+              >
+                {m.content}
+              </ReactMarkdown>
+            </div>
+          ) : null,
+        )}
         <div
-          key={m.id}
-          className={`py-3 px-2 mt-3 border-l-4 ${
-            m.role === "user"
-              ? "border-l-pink-100 bg-gray-100"
-              : "border-l-blue-100"
+          className={`animate-spin absolute bottom-0 right-0 ${
+            isLoading ? "" : "hidden"
           }`}
         >
-          <div className="markdown-body">
-            <ReactMarkdown
-              // children={m.content}
-              remarkPlugins={[remarkGfm]}
-              // components={{
-              //   code({ node, inline, className, children, ...props }) {
-              //     const match = /language-(\w+)/.exec(className || "");
-              //     return !inline && match ? (
-              //       <SyntaxHighlighter
-              //         {...props}
-              //         children={String(children).replace(/\n$/, "")}
-              //         style={tomorrowNight}
-              //         language={match[1]}
-              //         PreTag="div"
-              //       />
-              //     ) : (
-              //       <code {...props} className={className}>
-              //         {children}
-              //       </code>
-              //     );
-              //   },
-              // }}
-            >
-              {m.content}
-            </ReactMarkdown>
-          </div>
+          <Image width={32} height={32} alt="spinner" src={spinner} />
         </div>
-      ))}
-
-      <form onSubmit={handleSubmit} className="flex mt-3">
-        <label className="flex-1 mr-3">
-          <input
-            value={input}
-            onChange={handleInputChange}
-            className="border p-2 w-full"
-          />
-        </label>
-        <button type="submit" className="bg-gray-100 p-2">
-          Send
-        </button>
-      </form>
+      </div>
     </div>
-  );
+  )
 }

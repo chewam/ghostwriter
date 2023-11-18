@@ -26,8 +26,17 @@ body {
     rgb(var(--background-start-rgb));
 } */
 
+html, body {
+  @apply h-full;
+}
+
+body {
+  @apply flex flex-col;
+}
+
 .markdown-body {
-  background-color: transparent !important;
+  @apply bg-transparent text-slate-700;
+  /* background-color: transparent !important; */
 }
 
 .markdown-body pre > div {
