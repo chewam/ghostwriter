@@ -7,9 +7,7 @@ import ReactMarkdown from "react-markdown"
 import { useEffect, useRef, useState } from "react"
 import ReactCodeMirror from "@uiw/react-codemirror"
 import { languages } from "@codemirror/language-data"
-// import { githubDark } from "@uiw/codemirror-theme-github"
-// import { materialLight } from "@uiw/codemirror-theme-material"
-import { duotoneLight } from "@uiw/codemirror-theme-duotone"
+import { quietlight } from "@uiw/codemirror-theme-quietlight"
 import { markdown, markdownLanguage } from "@codemirror/lang-markdown"
 
 import useDebounce from "@/lib/use-debounce"
@@ -36,7 +34,6 @@ export default function Page() {
 
   useEffect(() => {
     async function sendMessage() {
-      console.log("appel à appendRef.current()")
       const content = `Here is my text:
 ---
 ${debouncedValue}`
@@ -49,7 +46,6 @@ ${debouncedValue}`
 
   useEffect(() => {
     async function startConversation() {
-      console.log("start conversation")
       await appendRef.current({ content: SYSTEM_PROMPT, role: "system" })
     }
     if (!isStarting.current) {
@@ -66,7 +62,7 @@ ${debouncedValue}`
         value={value}
         height="100%"
         autoFocus={true}
-        theme={duotoneLight}
+        theme={quietlight}
         onChange={(value) => setValue(value)}
         className="flex-1 shadow overflow-auto relative"
         extensions={[

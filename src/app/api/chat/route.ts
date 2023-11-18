@@ -5,7 +5,6 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(req: Request) {
   const { messages } = await req.json()
-  console.log("API ROUTE MESSAGES", messages)
 
   const response = await openai.chat.completions.create({
     messages,
